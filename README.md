@@ -11,3 +11,4 @@ Hardware:
 
 Note: Jump GPIO0 to GND before power on ESP01 to enter Programming mode.
 or use "ESP LINK" usb adaptor for auto switching into programming mode
+or add a switch to usb adaptor to manually select programming mode
