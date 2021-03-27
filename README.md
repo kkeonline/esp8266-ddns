@@ -7,8 +7,9 @@ another solution is to use a small and low power consuming ESP-01s board instrea
 
 Hardware:
 1. ESP-01s
-2. USB to ESP-01 Adaptor
+2. USB-TTL for ESP-01 *
 
-Note: Jump GPIO0 to GND before power on ESP01 to enter Programming mode.
-or use "ESP LINK" usb adaptor for auto switching into programming mode
-or add a switch to usb adaptor to manually select programming mode
+I recommend "ESP LINK" USB-TTL for esp-01 it will automatic switch between working mode and programming mode.
+or use USB-TTL with onboard switch to manually select working or programming mode.
+If you use USB-TTL without switch you will have to connect GPIO0 to GND by hand before power on ESP01 to enter programming mode.
+I suggest to soldering a switch to the board between gpio0 and Gnd for easy to select mode.
