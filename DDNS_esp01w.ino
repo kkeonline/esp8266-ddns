@@ -5,7 +5,7 @@
 
 #define delayTime 50 // Delay between Frames
 #define wifiTimeout 60000
-#define bright 880 // led pwm brightness 0=On 1024=Off
+#define bright 128 // led pwm brightness 0=On 255=Off(Esp8266 >= 3.0) 1023=Off(esp8266 < 3)
 
 const char* ssid = "SSID";
 const char* password = "PASSWD";
@@ -13,6 +13,7 @@ const char* ddnsdomain = "ddnsdomain";
 const char* ddnsuser = "ddnsuser";
 const char* ddnspass = "ddnspass" ;
 //const char* ddnstoken = "ddnstoken" ;
+
   /*
     List of supported DDNS providers:
     - "duckdns"
@@ -27,7 +28,9 @@ const char* ddnspass = "ddnspass" ;
     - "freemyip"
     - "afraid.org"
   */
+
 const char* ddnsprovider = "dynu" ;
+const int dnsInterval = 30000;     // DDNS check interval
 
 const char* OTAname = "OTANAME";
 const char* OTApasswd = "OTAPASSWD";
@@ -35,12 +38,13 @@ const char* OTApasswd = "OTAPASSWD";
 static const char ntpServerName[] = "th.pool.ntp.org";
 const int timeZone = 7;     // Central European Time
 
-unsigned long nextMillis;        // will store last time LED was updated
+unsigned long lastMillis;        // will store last time LED was updated
 int LEDinterval = 1000;           // interval at which to blink (milliseconds)
+const int intervalSlow = 1000;     // Wifi connected blink rate
+const int intervalFast = 200;     // Wifi disconnected blink rate
 
 const int ledPin =  LED_BUILTIN;// the number of the LED pin
 int ledState;             // ledState used to set the LED
-int notifyLine = false;
 String myIP;
 
 void Blink(){
@@ -74,7 +78,7 @@ void setup() {
       Serial.println(" Timeout!");
       break;  
     }
-    delay(250);
+    delay(intervalFast);
     Blink();
   }
   
@@ -105,26 +109,25 @@ ArduinoOTA.begin();
     Serial.println(newIP);
   });
 
-  nextMillis = millis()+LEDinterval;
+  lastMillis = millis();
   Serial.println();
   Serial.println("Running.");
 }
 
 void loop(){
     if (wifiConnected()) {
-      LEDinterval=1000;
+      LEDinterval=intervalSlow;
       ArduinoOTA.handle();
-      EasyDDNS.update(15000);
+      EasyDDNS.update(dnsInterval);
     } else {
-      LEDinterval=250;
+      LEDinterval=intervalFast;
     }
 
-    if (millis() >= nextMillis) {
-        while(nextMillis <= millis() ) {
-            nextMillis+=LEDinterval;
-        }
+   unsigned long currentMillis = millis();
+   if (currentMillis - lastMillis >= LEDinterval) {
+        lastMillis = currentMillis;
         Blink();
-    } 
+    }
 
   delay(delayTime);
 }
